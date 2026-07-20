@@ -1,0 +1,115 @@
+# O O 베이킹 클래스 예약 관리 서비스
+
+주말 원데이 베이킹 클래스를 소개하고, 손님이 예약 문의를 남길 수 있는 간단한 예약 관리 실습 프로젝트입니다.
+
+현재는 고객 페이지(`index.html`)만 구현되어 있습니다. 관리자 화면은 나중에 만들 예정입니다.
+
+## 전체 구조
+
+```text
+수업18일차_코덱스로실습/
+├─ index.html
+├─ PRD.md
+├─ CLAUDE.md
+├─ PROJECT_FLOW_DIAGRAM.md
+├─ 수업_인수인계.md
+└─ skills/
+   └─ supabase-rls-helper/
+      └─ SKILL.md
+```
+
+## 파일 역할
+
+- `index.html`: 고객이 보는 페이지입니다. 클래스 소개, 예약 문의 폼, CSS, JavaScript가 들어 있습니다.
+- `PRD.md`: 어떤 기능을 만들고, 어떤 기능을 만들지 않을지 정리한 기획 문서입니다.
+- `CLAUDE.md`: Claude가 작업할 때 지켜야 할 규칙입니다.
+- `PROJECT_FLOW_DIAGRAM.md`: 전체 파일 관계, 함수 호출, 데이터 이동을 Mermaid 다이어그램으로 정리한 문서입니다.
+- `수업_인수인계.md`: 집에서 이어서 작업하기 위한 설치와 진행 메모입니다.
+- `skills/supabase-rls-helper/SKILL.md`: Supabase RLS 정책을 설계할 때 참고하는 로컬 스킬입니다.
+
+## 현재 구현된 기능
+
+1. 베이킹 클래스 대표 문구 표시
+2. 클래스 소개 카드 3개 표시
+3. 예약 문의 폼 표시
+4. 필수 입력값 확인
+5. Supabase `reservations` 테이블에 예약 문의 저장
+6. 성공하면 `접수되었습니다.` 메시지 표시
+7. 실패하면 Supabase `error.message`를 화면에 표시
+
+## 화면 흐름
+
+```text
+손님이 index.html 접속
+→ 이름, 연락처, 희망 날짜, 요청사항 입력
+→ 접수하기 버튼 클릭
+→ 빈 칸 확인
+→ Supabase reservations 테이블에 insert
+→ 성공 또는 실패 메시지 표시
+```
+
+## 데이터 흐름
+
+예약 폼에서 입력한 값은 아래처럼 Supabase로 이동합니다.
+
+```text
+name input        → reservations.name
+phone input       → reservations.contact
+date input        → reservations.hope_date
+request textarea  → reservations.request
+```
+
+`status`는 화면에서 보내지 않습니다. 데이터베이스 기본값인 `대기`가 자동으로 들어갑니다.
+
+## Supabase 테이블
+
+테이블 이름:
+
+```text
+reservations
+```
+
+주요 컬럼:
+
+- `id`: 자동 증가 기본키
+- `name`: 손님 이름
+- `contact`: 연락처
+- `hope_date`: 희망 날짜
+- `request`: 요청사항
+- `status`: 상태, 기본값 `대기`
+- `created_at`: 접수 시각, 기본값 `now()`
+
+## RLS 권한
+
+현재 RLS 정책은 최소로 설정되어 있습니다.
+
+- 익명 사용자(`anon`)는 `insert`만 가능
+- `select`, `update`, `delete` 정책은 아직 없음
+- 정책이 없는 동작은 자동 차단됨
+
+즉, 손님은 예약 문의를 남길 수 있지만 다른 예약 목록을 볼 수 없습니다.
+
+## 실행 방법
+
+가장 간단한 방법은 `index.html`을 브라우저에서 직접 여는 것입니다.
+
+로컬 서버가 필요하면 PowerShell에서 실행합니다.
+
+```powershell
+npx.cmd serve .
+```
+
+## 아직 만들지 않은 것
+
+- 관리자 화면 `admin.html`
+- 관리자 로그인
+- 예약 목록 조회
+- 예약 확정
+- 예약 삭제
+- 결제 기능
+- 고객 회원가입
+
+## 참고 문서
+
+자세한 함수 호출과 데이터 이동은 `PROJECT_FLOW_DIAGRAM.md`를 확인합니다.
+
